@@ -1,0 +1,22 @@
+{
+  "name": "imiro",
+  "version": "0.0.1",
+  "description": "landing page cakes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/woodsleaf/imiro.git"
+  },
+  "keywords": [
+    "landingpage"
+  ],
+  "author": "woodsleaf",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/woodsleaf/imiro/issues"
+  },
+  "homepage": "https://github.com/woodsleaf/imiro#readme"
+}
