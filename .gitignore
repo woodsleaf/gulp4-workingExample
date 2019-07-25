@@ -1,0 +1,21 @@
+#игнорим cgi-bin
+public_html/cgi-bin
+#игнорим media
+public_html/media/*
+#разрешаем исключение добавление в репозиторий файла media/.gitignore
+!public_html/media/.gitignore
+#игнорим img
+public_html/img/*
+#аналогично третьей строке
+!public_html/img/.gitignore
+
+public_html/vendor/*
+#Полный путь к каталогу который надо исключить из исключения /public_html/node_modules/open-sans-fonts/fonts/
+#игнорим node_modules(и в нем нет пустого файла .gitignore)
+*/node_modules/*
+#разрешаем подкаталог open-sans-fonts
+#!*/node_modules/open-sans-fonts/
+#игнорим содержимое подкаталога open-sans-fonts(и в нем тоже нет .gitignore)
+#*/node_modules/open-sans-fonts/*
+#разрешаем подкаталог fonts подкаталога open-sans-fonts
+#!*/node_modules/open-sans-fonts/fonts/
