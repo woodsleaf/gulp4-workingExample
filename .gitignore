@@ -9,7 +9,7 @@ public_html/img/*
 #аналогично третьей строке
 !public_html/img/.gitignore
 
-public_html/vendor/*
+*/vendor/*
 #Полный путь к каталогу который надо исключить из исключения /public_html/node_modules/open-sans-fonts/fonts/
 #игнорим node_modules(и в нем нет пустого файла .gitignore)
 */node_modules/*
