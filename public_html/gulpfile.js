@@ -40,25 +40,27 @@ function browserSyncReload(done) {
 
 // Clean assets
 function clean() {
-  return del(["./src/"]);
+  return del(['build/']);
 }
 
+/*
 function defaultTask(cb) {
     // place code for your default task here
     cb();
 }
+*/
 
 function html() {
   return src('src/templates/*.pug')
     .pipe(pug())
     .pipe(dest('build/html'))
 }
+
 function mdown() {
     return src('src/cnt/md/*.md')
         .pipe(markdown())
         .pipe(dest('build/cnt/html'))
 }
-
 
 function css() {
     return src('src/css/*.sass')
@@ -82,16 +84,6 @@ function jsmin(){
         .pipe(uglify())
         .pipe(dest('build/js', { sourcemaps: true }))
 }
-/*function js() {
-    series(jsmerge, jsmin)
-}*/
-
-/*function js() {
-  return src('src/js/*.js', { sourcemaps: true })
-        .pipe(concat('app.merge.js'))
-        .pipe(dest('build/js', { sourcemaps: true }))
-}
-*/
 
 // Optimize images var1 сжимает лучше, от второго варианта отличаются настройками и модулем обработки jpeg
 function imgmin(){
@@ -111,7 +103,7 @@ function imgmin(){
 }
 
 // Optimize images var2
-function imgmin2() {       //v
+function imgmin2() {
     return src('src/cnt/img/**/*')
     .pipe(imagemin([
         imagemin.gifsicle({interlaced: true}),
@@ -198,7 +190,6 @@ function watchFiles() {
         ],
         series(/*jekyll,*/browserSyncReload)
     );
-    //watch("src/cnt/img/**/*", imgmin);
     //watch("src/cnt/img/**/*", imgmin2);
     watch("src/cnt/img/**/*", series(exportWebP, /*extWebp,*/ imgmin));
 }
