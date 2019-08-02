@@ -6,6 +6,8 @@ public_html/media/*
 !public_html/media/.gitignore
 #игнорим img
 public_html/img/*
+public_html/src/cnt/img/*
+public_html/build/cnt/img/*
 #аналогично третьей строке
 !public_html/img/.gitignore
 

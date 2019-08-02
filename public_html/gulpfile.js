@@ -1,16 +1,24 @@
 const { src, dest, parallel, series, watch } = require('gulp');  // , series
+const browsersync = require('browser-sync').create();
+const rename = require('gulp-rename');
+
+const markdown = require('gulp-markdown');
 const pug = require('gulp-pug');
+
 //const less = require('gulp-less');
 const sass = require('gulp-sass');
-const rename = require('gulp-rename');
 //const scss = require('gulp-scss');
 const minifyCSS = require('gulp-csso');
-const uglify = require("gulp-uglify-es").default;
+
 const concat = require('gulp-concat');
-const imagemin = require('gulp-imagemin');
+const uglify = require("gulp-uglify-es").default;
+
 const autoprefixer = require('gulp-autoprefixer');
-const browsersync = require('browser-sync').create();
-const markdown = require('gulp-markdown');
+
+const imagemin = require('gulp-imagemin');
+const imgCompress  = require('imagemin-jpeg-recompress');
+//const imagemin = require('imagemin');
+//const imageminWebp = require('imagemin-webp');
 //const jekyll = require('jekyll');
 
 
@@ -86,6 +94,72 @@ function jsmin(){
 }
 */
 
+// Optimize images var1 сжимает лучше, от второго варианта отличаются настройками и модулем обработки jpeg
+function imgmin(){
+    return src('src/cnt/img/**/*')
+        .pipe(imagemin([
+            imgCompress({
+              loops: 4,
+              min: 70,
+              max: 80,
+              quality: 'high'
+            }),
+            imagemin.gifsicle(),
+            imagemin.optipng(),
+            imagemin.svgo()
+        ]))
+        .pipe(dest('build/cnt/img'))
+}
+
+// Optimize images var2
+function imgmin2() {       //v
+    return src('src/cnt/img/**/*')
+    .pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({
+            plugins: [
+                {removeViewBox: true},
+                {cleanupIDs: false}
+            ]
+        })
+    ]))
+    .pipe(dest('build/cnt/img'))
+}
+
+
+/*
+imagemin(['cnt/img/*.{jpg,png}'], 'build/cnt/img', {
+	use: [
+		imageminWebp({quality: 50})
+	]
+}).then(() => {
+	console.log('Images optimized');
+});
+*/
+
+/*
+// Таск для оптимизации изображений
+gulp.task('img:prod', function () {
+	return gulp.src(path.src.img) //Выберем наши картинки
+		.pipe(debug({title: 'building img:', showFiles: true}))
+		.pipe(plumber(plumberOptions))
+		.pipe(gulp.dest(path.prod.img)) //Копируем изображения заранее, imagemin может пропустить парочку )
+		.pipe(imagemin([
+			imagemin.gifsicle({interlaced: true}),
+			imageminJpegRecompress({
+				progressive: true,
+				max: 80,
+				min: 70
+			}),
+			imageminPngquant({quality: '80'}),
+			imagemin.svgo({plugins: [{removeViewBox: true}]})
+		]))
+		.pipe(gulp.dest(path.prod.img)); //И бросим в prod отпимизированные изображения
+});
+*/
+
 // Watch files
 function watchFiles() {
     watch("src/css/*.sass", css);
@@ -106,7 +180,8 @@ function watchFiles() {
         ],
         series(/*jekyll,*/browserSyncReload)
     );
-    watch("src/cnt/img/**/*", imagemin);
+    watch("src/cnt/img/**/*", imgmin);
+    //watch("src/cnt/img/**/*", imgmin2);
 }
 
 //exports.js = js;
