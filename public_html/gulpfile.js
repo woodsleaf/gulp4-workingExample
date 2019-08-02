@@ -8,19 +8,18 @@ const pug = require('gulp-pug');
 //const less = require('gulp-less');
 const sass = require('gulp-sass');
 //const scss = require('gulp-scss');
+const autoprefixer = require('gulp-autoprefixer');
 const minifyCSS = require('gulp-csso');
 
 const concat = require('gulp-concat');
 const uglify = require("gulp-uglify-es").default;
 
-const autoprefixer = require('gulp-autoprefixer');
-
 const imagemin = require('gulp-imagemin');
 const imgCompress  = require('imagemin-jpeg-recompress');
+const webp = require('imagemin-webp');
 //const imagemin = require('imagemin');
-//const imageminWebp = require('imagemin-webp');
 //const jekyll = require('jekyll');
-
+const extReplace = require("gulp-ext-replace");
 
 // BrowserSync
 function browserSync(done) {
@@ -160,6 +159,25 @@ gulp.task('img:prod', function () {
 });
 */
 
+function exportWebP() {
+    return src(['src/cnt/img/**/*.jpg', 'src/cnt/img/**/*.png', 'src/cnt/img/**/*.gif'])  // 'src/cnt/img/**/*'
+        .pipe(imagemin([
+            webp({
+            quality: 75
+            })
+        ]))
+        //.pipe(rename('*.webp'))
+        .pipe(extReplace('.webp'))
+        .pipe(dest('build/cnt/img'))
+}
+
+//function extWebp() {
+//    return src(['build/cnt/img/**/*.jpg', 'build/cnt/img/**/*.png', 'build/cnt/img/**/*.gif'])
+//        //.pipe(rename('*.webp'))
+//        .pipe(extReplace('.webp'))
+//        .pipe(dest('build/cnt/img'))
+//}
+
 // Watch files
 function watchFiles() {
     watch("src/css/*.sass", css);
@@ -180,13 +198,15 @@ function watchFiles() {
         ],
         series(/*jekyll,*/browserSyncReload)
     );
-    watch("src/cnt/img/**/*", imgmin);
+    //watch("src/cnt/img/**/*", imgmin);
     //watch("src/cnt/img/**/*", imgmin2);
+    watch("src/cnt/img/**/*", series(exportWebP, /*extWebp,*/ imgmin));
 }
 
 //exports.js = js;
 exports.css = css;
 exports.html = parallel(html, mdown);
 exports.all = parallel(html, css/*, js*/);
+exports.imgall = series(exportWebP, /*extWebp,*/ imgmin);
 exports.default = defaultTask;
 exports.watch = parallel(watchFiles, browserSync);
