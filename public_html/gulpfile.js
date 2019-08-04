@@ -1,67 +1,187 @@
-const { src, dest, parallel, series, watch } = require('gulp');  // , series
-const browsersync = require('browser-sync').create();
+const { src, dest, parallel, series, watch, task} = require('gulp');
+const browserSync = require('browser-sync').create();
+const reload = browserSync.reload; /* now not used */
 const rename = require('gulp-rename');
 
 const markdown = require('gulp-markdown');
 const pug = require('gulp-pug');
 
-//const less = require('gulp-less');
 const sass = require('gulp-sass');
+//const less = require('gulp-less');
 //const scss = require('gulp-scss');
 const autoprefixer = require('gulp-autoprefixer');
+const cleanCSS = require('gulp-clean-css');
 const minifyCSS = require('gulp-csso');
 
 const concat = require('gulp-concat');
-const uglify = require("gulp-uglify-es").default;
+const uglify = require("gulp-uglify");
+const uglify6 = require("gulp-uglify-es").default;
 
 const imagemin = require('gulp-imagemin');
 const imgCompress  = require('imagemin-jpeg-recompress');
 const webp = require('imagemin-webp');
-//const imagemin = require('imagemin');
+const extReplace = require('gulp-ext-replace');
+const changed = require('gulp-changed');
+const lineec = require('gulp-line-ending-corrector');
 //const jekyll = require('jekyll');
-const extReplace = require("gulp-ext-replace");
+const sourcemaps = require('gulp-sourcemaps');  // Кажется не требуется
 
-// BrowserSync
-function browserSync(done) {
-    browsersync.init({
+// Вторжение
+const themename = 'devwp';  // !!!
+const root = './' + themename + '/';  // ../
+const scss = root + 'sass/';
+
+const js = root + 'src/js/';
+const jsdist = root + 'dest/js';
+
+const phpWatchFiles = root + '**/*.php';
+const styleWatchFiles = [root + '**/*.scss', root + '**/*.sass'];  // [root + '**/*.scss', root + '**/*.sass']
+
+const jsSRC = [
+    /*js + '',
+    js + '',
+    js + '',
+    js + '',
+    js + '',
+    js + '',
+    js + '',*/
+    js + '**/*.js'
+];
+
+const cssSRC = [
+    //root + 'src/css/bootstrap.css',
+    root + 'src/css/all.css',
+    root + 'src/css/prism.css',
+    root + 'style.css'
+];
+
+const imgSRC = root + 'src/images/**/*';  // ['src/cnt/img/**/*.jpg', 'src/cnt/img/**/*.png', 'src/cnt/img/**/*.gif']
+const imgDEST = root + 'dest/images';
+
+const templateSRC = root + 'src/templates/**/*.pug';
+const templateDEST = root + 'dest/templates';
+const articleSRC = root + 'src/articles/**/*.md';
+const articleDEST = root + 'dest/articles';
+
+function css() {
+    return src([scss + '**/*.sass', scss + '**/*.style.scss'])
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(sass({
+        outputStyle: 'expanded'
+    }).on('error', sass.logError))
+    .pipe(autoprefixer('last 2 versions'))
+    .pipe(sourcemaps.write())
+    .pipe(lineec())
+    .pipe(dest(root));
+}
+
+function concatCSS() {
+    return src(cssSRC)
+    .pipe(sourcemaps.init({loadMaps: true, largeFile: true}))
+    .pipe(concat('style.min.css'))
+    .pipe(cleanCSS())
+    .pipe(sourcemaps.write('./maps/'))
+    .pipe(lineec())
+    .pipe(dest(scss));
+}
+
+function javascript() {
+    return src(jsSRC)
+    .pipe(concat(themename + '.js'))
+    .pipe(dest(jsdist))
+    .pipe(rename({ extname: '.min.js' }))
+    .pipe(uglify())
+    .pipe(lineec())
+    .pipe(dest(jsdist));
+}
+
+function imgmin() {
+    return src(imgSRC)
+    .pipe(changed(imgDEST))
+    /*.pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5})
+    ]))*/
+    .pipe(imagemin([
+        imgCompress({
+          loops: 4,
+          min: 70,
+          max: 80,
+          quality: 'high'
+        }),
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({
+            plugins: [
+                {removeViewBox: true},
+                {cleanupIDs: false}
+            ]
+        })
+    ]))
+    .pipe(dest(imgDEST))
+    .pipe(imagemin([
+        webp({
+        quality: 75
+        })
+    ]))
+    .pipe(rename({ extname: '.webp' }))
+    .pipe(dest(imgDEST));
+}
+
+function html() {
+    return src(templateSRC)
+    .pipe(pug())
+    .pipe(dest(templateDEST));
+}
+
+function php() {
+    return src(templateSRC)
+    .pipe(pug({pretty: true}))
+    .pipe(rename({extname: '.php'}))
+    .pipe(dest(templateDEST));
+}
+
+function mdown() {
+    return src(articleSRC)
+    .pipe(markdown())
+    .pipe(dest(articleDEST));
+}
+
+function watcher() {
+    /*
+    browserSync.init({
+        open: 'external',
+        proxy: 'http://localhost/dev',
+        port: 8080,
+    });
+    */
+    browserSync.init({
         proxy: 'loc.cakenew:80',
         baseDir: "./",
         open:true,
         notify:false
     });
-    done();
+    watch(styleWatchFiles, series([css, concatCSS]));
+    watch(jsSRC, javascript);
+    watch(imgSRC, imgmin);
+    watch([phpWatchFiles, jsdist + 'devwp.js', scss + 'style.min.css']).on('change', reload);
+    watch(templateSRC, php);  // html
+    watch(articleSRC, mdown);
 }
 
-// BrowserSync Reload
-function browserSyncReload(done) {
-    browsersync.reload();
-    done();
-}
+exports.css = css;
+exports.concatCSS = concatCSS;
+exports.javascript = javascript;
+exports.watcher = watcher;
+exports.imgmin = imgmin;
+exports.php = php;  // exports.html = html;
+exports.mdown = mdown;
 
-// Clean assets
-function clean() {
-  return del(['build/']);
-}
+const build = parallel(watcher);
+task('default', build);
 
-/*
-function defaultTask(cb) {
-    // place code for your default task here
-    cb();
-}
-*/
-
-function html() {
-  return src('src/templates/*.pug')
-    .pipe(pug())
-    .pipe(dest('build/html'))
-}
-
-function mdown() {
-    return src('src/cnt/md/*.md')
-        .pipe(markdown())
-        .pipe(dest('build/cnt/html'))
-}
-
+/* по другому настроен прификс
 function css() {
     return src('src/css/*.sass')
     //.pipe(less())
@@ -72,132 +192,9 @@ function css() {
     .pipe(minifyCSS())
     .pipe(dest('build/css'))
 }
-
-function jsmerge() {
-    return src('src/js/*.js', { sourcemaps: true })
-        .pipe(concat('app.merge.js'))
-        .pipe(dest('build/js/merge', { sourcemaps: true }))
-}
-function jsmin(){
-    return src('build/js/merge/*.merge.js', { sourcemaps: true })
-        .pipe(rename('app.min.js'))
-        .pipe(uglify())
-        .pipe(dest('build/js', { sourcemaps: true }))
-}
-
-// Optimize images var1 сжимает лучше, от второго варианта отличаются настройками и модулем обработки jpeg
-function imgmin(){
-    return src('src/cnt/img/**/*')
-        .pipe(imagemin([
-            imgCompress({
-              loops: 4,
-              min: 70,
-              max: 80,
-              quality: 'high'
-            }),
-            imagemin.gifsicle(),
-            imagemin.optipng(),
-            imagemin.svgo()
-        ]))
-        .pipe(dest('build/cnt/img'))
-}
-
-// Optimize images var2
-function imgmin2() {
-    return src('src/cnt/img/**/*')
-    .pipe(imagemin([
-        imagemin.gifsicle({interlaced: true}),
-        imagemin.jpegtran({progressive: true}),
-        imagemin.optipng({optimizationLevel: 5}),
-        imagemin.svgo({
-            plugins: [
-                {removeViewBox: true},
-                {cleanupIDs: false}
-            ]
-        })
-    ]))
-    .pipe(dest('build/cnt/img'))
-}
-
-
-/*
-imagemin(['cnt/img/*.{jpg,png}'], 'build/cnt/img', {
-	use: [
-		imageminWebp({quality: 50})
-	]
-}).then(() => {
-	console.log('Images optimized');
-});
 */
 
-/*
-// Таск для оптимизации изображений
-gulp.task('img:prod', function () {
-	return gulp.src(path.src.img) //Выберем наши картинки
+/*  // OFF plumber? debug?
 		.pipe(debug({title: 'building img:', showFiles: true}))
 		.pipe(plumber(plumberOptions))
-		.pipe(gulp.dest(path.prod.img)) //Копируем изображения заранее, imagemin может пропустить парочку )
-		.pipe(imagemin([
-			imagemin.gifsicle({interlaced: true}),
-			imageminJpegRecompress({
-				progressive: true,
-				max: 80,
-				min: 70
-			}),
-			imageminPngquant({quality: '80'}),
-			imagemin.svgo({plugins: [{removeViewBox: true}]})
-		]))
-		.pipe(gulp.dest(path.prod.img)); //И бросим в prod отпимизированные изображения
-});
 */
-
-function exportWebP() {
-    return src(['src/cnt/img/**/*.jpg', 'src/cnt/img/**/*.png', 'src/cnt/img/**/*.gif'])  // 'src/cnt/img/**/*'
-        .pipe(imagemin([
-            webp({
-            quality: 75
-            })
-        ]))
-        //.pipe(rename('*.webp'))
-        .pipe(extReplace('.webp'))
-        .pipe(dest('build/cnt/img'))
-}
-
-//function extWebp() {
-//    return src(['build/cnt/img/**/*.jpg', 'build/cnt/img/**/*.png', 'build/cnt/img/**/*.gif'])
-//        //.pipe(rename('*.webp'))
-//        .pipe(extReplace('.webp'))
-//        .pipe(dest('build/cnt/img'))
-//}
-
-// Watch files
-function watchFiles() {
-    watch("src/css/*.sass", css);
-    watch("src/js/**/*", series(jsmerge, jsmin));  //series(scriptsLint, scripts)
-    watch("src/cnt/md/**/*.md", mdown);//series(scriptsLint, scripts)
-    watch(
-        [
-        "build/css/*.css",
-        "src/css/*.sass",
-        "src/cnt/md/*.md",
-        "src/js/**/*",
-        "src/cnt/img/**/*"
-//        "./_includes/**/*",
-//        "./_layouts/**/*",
-//        "./_pages/**/*",
-//        "./_posts/**/*",
-//        "./_projects/**/*"
-        ],
-        series(/*jekyll,*/browserSyncReload)
-    );
-    //watch("src/cnt/img/**/*", imgmin2);
-    watch("src/cnt/img/**/*", series(exportWebP, /*extWebp,*/ imgmin));
-}
-
-//exports.js = js;
-exports.css = css;
-exports.html = parallel(html, mdown);
-exports.all = parallel(html, css/*, js*/);
-exports.imgall = series(exportWebP, /*extWebp,*/ imgmin);
-exports.default = defaultTask;
-exports.watch = parallel(watchFiles, browserSync);

@@ -5,11 +5,10 @@ public_html/media/*
 #разрешаем исключение добавление в репозиторий файла media/.gitignore
 !public_html/media/.gitignore
 #игнорим img
-public_html/img/*
-public_html/src/cnt/img/*
-public_html/build/cnt/img/*
+*/devwp/src/images/*
+*/devwp/dest/images/*
 #аналогично третьей строке
-!public_html/img/.gitignore
+!*/images/.gitignore
 
 */vendor/*
 #Полный путь к каталогу который надо исключить из исключения /public_html/node_modules/open-sans-fonts/fonts/
