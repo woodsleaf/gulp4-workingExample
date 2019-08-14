@@ -3,7 +3,7 @@ const browserSync = require('browser-sync').create();
 const reload = browserSync.reload; /* now not used */
 const rename = require('gulp-rename');
 
-const markdown = require('gulp-markdown');
+//const markdown = require('gulp-markdown');  // vulnerable
 const pug = require('gulp-pug');
 
 const sass = require('gulp-sass');
@@ -142,11 +142,13 @@ function php() {
     .pipe(dest(templateDEST));
 }
 
+/*
 function mdown() {
     return src(articleSRC)
     .pipe(markdown())
     .pipe(dest(articleDEST));
 }
+*/
 
 function watcher() {
     /*
@@ -167,7 +169,7 @@ function watcher() {
     watch(imgSRC, imgmin);
     watch([phpWatchFiles, jsdist + 'devwp.js', scss + 'style.min.css']).on('change', reload);
     watch(templateSRC, php);  // html
-    watch(articleSRC, mdown);
+    watch(articleSRC/*, mdown*/);
 }
 
 exports.css = css;
@@ -176,7 +178,7 @@ exports.javascript = javascript;
 exports.watcher = watcher;
 exports.imgmin = imgmin;
 exports.php = php;  // exports.html = html;
-exports.mdown = mdown;
+// exports.mdown = mdown;
 
 const build = parallel(watcher);
 task('default', build);
