@@ -1,5 +1,12 @@
 # Gulp4-browsersyncWorkWithOpenServer-jsConcatMinify-cssSass-mdMarkdownToHtml
-## !!! markdown vulnerably sorry
+
+## Prepare
+install node.js
+check add them in %PATH%
+npm install --global gulp-cli
+npm install yarn -G
+Go to project in console and execute `yarn` for install node_modules
+
 ## Включение наблюдения
 `gulp watch`
 
@@ -14,7 +21,7 @@ Autoprefix css. пока не работает - не добавляются п�
 Минификация css.
 
 ## Markdown to html
-Просто Конвертация.
+Отключен(markdown vulnerably) Просто Конвертация.
 
 ## PUG to html
 Отключен
@@ -42,5 +49,3 @@ Autoprefix css. пока не работает - не добавляются п�
 Другие примеры.
 [Примеры использования imagemin.](https://github.com/imagemin/imagemin)
 [Примеры использования imagemin-webp.](https://github.com/imagemin/imagemin-webp)
-
-
