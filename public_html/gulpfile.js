@@ -1,3 +1,4 @@
+const localDomainUrl = 'loc.cakenew:80';
 const { src, dest, parallel, series, watch, task} = require('gulp');
 const browserSync = require('browser-sync').create();
 const reload = browserSync.reload; /* now not used */
@@ -159,7 +160,7 @@ function watcher() {
     });
     */
     browserSync.init({
-        proxy: 'loc.cakenew:80',
+        proxy: localDomainUrl,
         baseDir: "./",
         open:true,
         notify:false
