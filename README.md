@@ -8,6 +8,7 @@ npm install yarn -G
 Go to project in console and execute `yarn` for install node_modules
 
 ## Включение наблюдения
+Execute from console in directory public_html
 `gulp watch`
 
 ## Browsersync + PHP
