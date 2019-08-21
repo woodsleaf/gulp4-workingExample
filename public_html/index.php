@@ -1,1 +1,1 @@
-<?php require 'devwp/app.php'; ?>
+<?php require './devwp/app.php'; ?>

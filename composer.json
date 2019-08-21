@@ -1,0 +1,17 @@
+{
+    "name": "woodsleaf/gulpexample",
+    "description": "gulpexample",
+    "license": "GPL3",
+    "authors": [
+        {
+            "name": "woodsleaf",
+            "email": "freepostpair@gmail.com"
+        }
+    ],
+    "config": {
+        "vendor-dir": "public_html/vendor"
+    },
+    "require": {
+        "phug/phug": "^0.3.2"
+    }
+}

@@ -1,68 +1,74 @@
+/*jshint esversion: 6 */
 const localDomainUrl = 'loc.cakenew:80';
 const { src, dest, parallel, series, watch, task} = require('gulp');
 const browserSync = require('browser-sync').create();
-const reload = browserSync.reload; /* now not used */
+const reload = browserSync.reload;
+const concat = require('gulp-concat');
 const rename = require('gulp-rename');
+const php = require('gulp-connect-php');
 
-//const markdown = require('gulp-markdown');  // vulnerable
-const pug = require('gulp-pug');
+// const markdown = require('gulp-markdown');  // vulnerable
+// const pug = require('gulp-pug');  //not used
+// const twig = require('gulp-twig');  //fucnction twigto not work
 
 const sass = require('gulp-sass');
 //const less = require('gulp-less');
 //const scss = require('gulp-scss');
+const browserslist = require('browserslist');
 const autoprefixer = require('gulp-autoprefixer');
-const cleanCSS = require('gulp-clean-css');
-const minifyCSS = require('gulp-csso');
+const cleanCSS = require('gulp-clean-css');  // minify css
+// const minifyCSS = require('gulp-csso');
 
-const concat = require('gulp-concat');
+
 const uglify = require("gulp-uglify");
 const uglify6 = require("gulp-uglify-es").default;
 
 const imagemin = require('gulp-imagemin');
 const imgCompress  = require('imagemin-jpeg-recompress');
 const webp = require('imagemin-webp');
-const extReplace = require('gulp-ext-replace');
+// const extReplace = require('gulp-ext-replace');
 const changed = require('gulp-changed');
 const lineec = require('gulp-line-ending-corrector');
 //const jekyll = require('jekyll');
-const sourcemaps = require('gulp-sourcemaps');  // Кажется не требуется
+const sourcemaps = require('gulp-sourcemaps');  // Используется, но вроде можно штатными средствами gulp4.
 
 // Вторжение
 const themename = 'devwp';  // !!!
 const root = './' + themename + '/';  // ../
-const scss = root + 'sass/';
+const scss = root + 'src/sass/';
+const scssDEST = root + 'src/css/';
 
 const js = root + 'src/js/';
 const jsdist = root + 'dest/js';
 
 const phpWatchFiles = root + '**/*.php';
-const styleWatchFiles = [root + '**/*.scss', root + '**/*.sass'];  // [root + '**/*.scss', root + '**/*.sass']
+const styleWatchFiles = [scss + '**/*.scss', scss + '**/*.sass'];  // [root + '**/*.scss', root + '**/*.sass']
 
 const jsSRC = [
-    /*js + '',
-    js + '',
-    js + '',
-    js + '',
-    js + '',
-    js + '',
-    js + '',*/
+    /*js + '', js + '', js + '', js + '', js + '', js + '', js + '',*/
     js + '**/*.js'
 ];
 
 const cssSRC = [
+    './node_modules/normalize.css/normalize.css',
     //root + 'src/css/bootstrap.css',
     root + 'src/css/all.css',
     root + 'src/css/prism.css',
-    root + 'style.css'
+    root + 'src/css/style.css'
 ];
+const cssDEST = root + 'dest/css';
 
 const imgSRC = root + 'src/images/**/*';  // ['src/cnt/img/**/*.jpg', 'src/cnt/img/**/*.png', 'src/cnt/img/**/*.gif']
 const imgDEST = root + 'dest/images';
 
-const templateSRC = root + 'src/templates/**/*.pug';
-const templateDEST = root + 'dest/templates';
-const articleSRC = root + 'src/articles/**/*.md';
-const articleDEST = root + 'dest/articles';
+// const templateSRC = root + 'src/templates/**/*.pug';
+// const templateDEST = root + 'dest/templates';
+// const staticSRC = root + 'src/static/**/*.pug';
+// const staticDEST = root + 'dest/static';
+// const twigSRC = 'src/twig/**/*.twig';
+// const twigDEST = 'dest/twig';
+// const articleSRC = root + 'src/articles/**/*.md';
+// const articleDEST = root + 'dest/articles';
 
 function css() {
     return src([scss + '**/*.sass', scss + '**/*.style.scss'])
@@ -70,20 +76,25 @@ function css() {
     .pipe(sass({
         outputStyle: 'expanded'
     }).on('error', sass.logError))
-    .pipe(autoprefixer('last 2 versions'))
+    // .pipe(autoprefixer('> 0.1%'))  // last 2 versions
+    .pipe(autoprefixer({
+        cascade: false
+    }))
     .pipe(sourcemaps.write())
     .pipe(lineec())
-    .pipe(dest(root));
+    .pipe(dest(scssDEST)); // root
 }
 
 function concatCSS() {
     return src(cssSRC)
     .pipe(sourcemaps.init({loadMaps: true, largeFile: true}))
-    .pipe(concat('style.min.css'))
+    .pipe(concat('style.css'))
+    .pipe(dest(cssDEST))
+    .pipe(rename({ extname: '.min.css' }))
     .pipe(cleanCSS())
     .pipe(sourcemaps.write('./maps/'))
     .pipe(lineec())
-    .pipe(dest(scss));
+    .pipe(dest(cssDEST));
 }
 
 function javascript() {
@@ -130,24 +141,47 @@ function imgmin() {
     .pipe(dest(imgDEST));
 }
 
-function html() {
-    return src(templateSRC)
+/*
+function pugtohtml() {
+    return src(staticSRC)
     .pipe(pug())
-    .pipe(dest(templateDEST));
+    .pipe(dest(staticDEST));
 }
-
-function php() {
+*/
+/*
+function pugtophp() {
     return src(templateSRC)
     .pipe(pug({pretty: true}))
     .pipe(rename({extname: '.php'}))
     .pipe(dest(templateDEST));
 }
-
+*/
+/*
+function twigtophp() {
+    return src(twigSRC)
+    .pipe(twig({
+        data: {
+            title: 'Gulp and Twig',
+            benefits: [
+                'Fast',
+                'Flexible',
+                'Secure'
+            ]
+        }
+    }))
+    .pipe(dest(twigDEST));
+}
+*/
 /*
 function mdown() {
     return src(articleSRC)
     .pipe(markdown())
     .pipe(dest(articleDEST));
+}
+*/
+/*
+function serverphp(){
+    php.server({ base: 'build', port: 8010, keepalive: true});
 }
 */
 
@@ -159,18 +193,31 @@ function watcher() {
         port: 8080,
     });
     */
+
     browserSync.init({
         proxy: localDomainUrl,
         baseDir: "./",
         open:true,
         notify:false
     });
+
+   /*
+    serverphp;
+    browserSync.init({
+        proxy: '127.0.0.1:8010',
+        port: 8080,
+        open: true,
+        notify: false
+    });
+    */
     watch(styleWatchFiles, series([css, concatCSS]));
     watch(jsSRC, javascript);
     watch(imgSRC, imgmin);
     watch([phpWatchFiles, jsdist + 'devwp.js', scss + 'style.min.css']).on('change', reload);
-    watch(templateSRC, php);  // html
-    watch(articleSRC/*, mdown*/);
+    // watch(templateSRC, pugtophp);
+    // watch(staticSRC, pugtohtml);
+    // watch(articleSRC, mdown);
+    // watch(twigSRC, twigtophp);
 }
 
 exports.css = css;
@@ -178,8 +225,11 @@ exports.concatCSS = concatCSS;
 exports.javascript = javascript;
 exports.watcher = watcher;
 exports.imgmin = imgmin;
-exports.php = php;  // exports.html = html;
+// exports.pugtophp = pugtophp;
+// exports.pugtohtml = pugtohtml;
 // exports.mdown = mdown;
+// exports.twigtophp = twigtophp;
+// exports.serverphp = serverphp;
 
 const build = parallel(watcher);
 task('default', build);
