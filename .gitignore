@@ -9,6 +9,8 @@ public_html/media/*
 */devwp/dest/images/*
 #аналогично третьей строке
 !*/images/.gitignore
+#не хочу мусор копить в git
+*/devwp/dest/*
 
 */vendor/*
 vendor/*
