@@ -196,7 +196,8 @@ function watcher() {
         proxy: localDomainUrl,
         baseDir: "./",
         open:true,
-        notify:false
+        notify:false //,
+        //tunnel: true
     });
 
     watch(styleWatchFiles, series([css, concatCSS]));
