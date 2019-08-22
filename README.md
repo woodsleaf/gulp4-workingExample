@@ -10,6 +10,9 @@ Execute from console in directory public_html `gulp watcher`.
 ## Сборка всего проекта с очисткой `public_html/devwp/dest/*`
 Execute from console in directory public_html `gulp build` or `gulp`.
 
+## Сборка и последующее наблюдение
+`gulp dev`.
+
 ## Browsersync + PHP
 Реализовано через локальный сервер `const localDomainUrl` first string in `public_html/gulpfile.js`, поднять который можно средствами php, или какой нибудь сборкой типа OpenServer. Чтобы страничка обновлялась, нужно включить скрипты на странице, если они вдруг заблокированы. Начальный файл проекта `index.php` находится в корне сайта. Это возможно криво, но ориентировано на обычный хостинг.
 

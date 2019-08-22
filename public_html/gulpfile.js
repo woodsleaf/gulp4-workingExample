@@ -239,6 +239,7 @@ exports.build = build = series(
     ));
 
 task('default', build);
+task('dev', series(build, watcher));
 
 
 
