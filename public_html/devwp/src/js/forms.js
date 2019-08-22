@@ -46,7 +46,7 @@ $(document).ready(function () {
         var formNm = $('#' + formID);
         $.ajax({
             type: 'POST',
-            url: 'phpmail.php', // Обработчик формы отправки
+            url: 'phpmail.php', // Обработчик формы отправки 
             data: formNm.serialize(),
             success: function (data) {
                 // Вывод текста результата отправки в текущей форме
