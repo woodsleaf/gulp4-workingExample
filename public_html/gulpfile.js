@@ -7,7 +7,7 @@ const concat = require('gulp-concat');
 const rename = require('gulp-rename');
 const php = require('gulp-connect-php');
 
-// const markdown = require('gulp-markdown');  // vulnerable
+const markdown = require('gulp-markdown');  // vulnerable
 // const pug = require('gulp-pug');  //not used
 // const twig = require('gulp-twig');  //fucnction twigto not work
 
@@ -67,8 +67,8 @@ const imgDEST = root + 'dest/images';
 // const staticDEST = root + 'dest/static';
 // const twigSRC = 'src/twig/**/*.twig';
 // const twigDEST = 'dest/twig';
-// const articleSRC = root + 'src/articles/**/*.md';
-// const articleDEST = root + 'dest/articles';
+const articleSRC = root + 'src/articles/**/*.md';
+const articleDEST = root + 'dest/articles';
 
 function css() {
     return src([scss + '**/*.sass', scss + '**/*.style.scss'])
@@ -172,13 +172,13 @@ function twigtophp() {
     .pipe(dest(twigDEST));
 }
 */
-/*
+
 function mdown() {
     return src(articleSRC)
     .pipe(markdown())
     .pipe(dest(articleDEST));
 }
-*/
+
 /*
 function serverphp(){
     php.server({ base: 'build', port: 8010, keepalive: true});
@@ -216,7 +216,7 @@ function watcher() {
     watch([phpWatchFiles, jsdist + 'devwp.js', scss + 'style.min.css']).on('change', reload);
     // watch(templateSRC, pugtophp);
     // watch(staticSRC, pugtohtml);
-    // watch(articleSRC, mdown);
+    watch(articleSRC, mdown);
     // watch(twigSRC, twigtophp);
 }
 
@@ -227,7 +227,7 @@ exports.watcher = watcher;
 exports.imgmin = imgmin;
 // exports.pugtophp = pugtophp;
 // exports.pugtohtml = pugtohtml;
-// exports.mdown = mdown;
+exports.mdown = mdown;
 // exports.twigtophp = twigtophp;
 // exports.serverphp = serverphp;
 

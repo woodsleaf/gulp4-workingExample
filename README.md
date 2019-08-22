@@ -14,7 +14,7 @@ Execute from console in directory public_html `gulp watcher` или просто
 Обработка sass. Autoprefix css (конфиг public_html/.browserslistrc). Минификация css.
 
 ## Markdown to html
-Отключен(markdown vulnerably) Просто Конвертация.
+Markdown. Просто Конвертация. Vulnerably!
 
 ## PUG to html
 Отключен. Для js пока не требуется.
