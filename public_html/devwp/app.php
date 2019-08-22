@@ -1,7 +1,7 @@
 <?php
 
 $menua = json_decode(file_get_contents('./config.json'))->menua;
-foreach ($menua as $val) {
+/*foreach ($menua as $val) {
     if (gettype($val) == 'object') {
         //var_dump(serialize($val));
         $submenua = $val->Ассортимент;
@@ -11,7 +11,7 @@ foreach ($menua as $val) {
     } else {
         echo $val;
     }
-}
+}*/
 //var_dump($menua);
 // var_dump(__DIR__); // полный путь
 // var_dump($_SERVER['DOCUMENT_ROOT']);  // корень сайта
