@@ -24,3 +24,4 @@ node_modules/*
 #*/node_modules/open-sans-fonts/*
 #разрешаем подкаталог fonts подкаталога open-sans-fonts
 #!*/node_modules/open-sans-fonts/fonts/
+.vscode/*
