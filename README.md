@@ -1,8 +1,11 @@
 # Gulp4-browsersyncWorkWithOpenServer-jsConcatMinify-cssSass-mdMarkdownToHtml
 
 ## Prepare
-Install node.js. Check add them in `%PATH%`. Execute in console `npm install --global gulp-cli`. And it `npm install yarn -G`.
-Go to project in console and execute `yarn` for install node_modules.
+Install node.js. Check add them in `%PATH%`. Execute in console `npm install --global gulp-cli`.
+
+And it `npm install yarn -G`. Go to project in console and execute `yarn` for install node_modules.
+
+For install phug execute `composer install`(`pathtophp/php pathtocomposer/composer.phar install`).
 
 ## Включение наблюдения
 Execute from console in directory public_html `gulp watcher`.
