@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "browser-sync": "^2.26.7",
-    "browserslist": "^4.6.6",
+    "browserslist": "^4.16.5",
     "del": "^5.0.0",
     "gifsicle": "^4.0.1",
     "gulp": "^4.0.2",
